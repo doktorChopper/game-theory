@@ -132,6 +132,18 @@ func BrownRobinson(e float64) {
         i++
     }
 
+    fmt.Printf("~x = ( ")
+    for _,v := range xk {
+        fmt.Printf("%.3f ", float64(v) / float64(i + 1))
+    }
+    fmt.Println(")")
+
+    fmt.Printf("~y = ( ")
+    for _,v := range yk {
+        fmt.Printf("%.3f ", float64(v) / float64(i + 1))
+    }
+    fmt.Println(")")
+
 }
 
 func main() {
