@@ -275,13 +275,13 @@ func algAddition(m [][]float64) [][]float64 {
 
 func transposition(m [][]float64) [][]float64 {
 
-    t := make([][]float64, len(m))
-    for i := range m {
+    t := make([][]float64, len(m[0]))
+    for i := range m[0] {
         t[i] = make([]float64, len(m))
     }
 
     for i := 0; i < len(m); i++ {
-        for j := 0; j < len(m); j++ {
+        for j := 0; j < len(m[0]); j++ {
             t[j][i] = m[i][j]
         }
     }
@@ -303,6 +303,37 @@ func buildReverseMatrix(m [][]float64) [][]float64 {
     return a
 }
 
+func multMatrix(a [][]float64, b [][]float64) [][]float64 {
+
+    r := make([][]float64, len(a))
+    for i := range r {
+        r[i] = make([]float64, len(b[0]))
+    }
+
+    for i := 0; i < len(a); i++ {
+        for j := 0; j < len(b[0]); j++ {
+            s := 0.0
+            for k := 0; k < len(b); k++ {
+                s += a[i][k] * b[k][j]
+            }
+            r[i][j] = s
+        }
+    }
+
+    return r
+}
+
+func scalarDiv(s float64, m [][]float64) [][]float64 {
+
+    for i := 0; i < len(m); i++ {
+        for j := 0; j < len(m[0]); j++ {
+            m[i][j] /= s
+        }
+    }
+
+    return m
+}
+
 func main() {
 
     fmt.Printf("Brown-Robinson method\n\n")
@@ -316,6 +347,24 @@ func main() {
 
     // fmt.Println(det(C))
     // fmt.Println(transposition(algAddition(C)))
-    fmt.Println(buildReverseMatrix(C))
+    u := [][]float64{
+        {1, 1, 1},
+    }
+
+    uT := transposition(u)
+    rC := buildReverseMatrix(C)
+
+    fmt.Println(uT)
+    fmt.Println(rC)
+
+    o := multMatrix(u, rC)
+
+    fmt.Println()
+    fmt.Println(o)
+    fmt.Println()
+
+    fmt.Println(multMatrix(o, uT))
+
+    fmt.Println(scalarDiv(multMatrix(o, uT)[0][0], o))
 }
 
