@@ -45,7 +45,7 @@ func HN(n int) *matrix.Matrix {
     return ret
 }
 
-func MaxMin(m *matrix.Matrix) (float64, int) {
+func maxMin(m *matrix.Matrix) (float64, int) {
     a := []float64{}
 
     var min float64
@@ -74,7 +74,7 @@ func MaxMin(m *matrix.Matrix) (float64, int) {
     return maxMin, idx
 }
 
-func MinMax(m *matrix.Matrix) (float64, int) {
+func minMax(m *matrix.Matrix) (float64, int) {
 
     a := []float64{}
     var max float64
@@ -103,7 +103,7 @@ func MinMax(m *matrix.Matrix) (float64, int) {
     return minMax, idx
 }
 
-func MaxInd(a []float64) (int, error) {
+func maxInd(a []float64) (int, error) {
     
     if len(a) == 0 {
         return 0, errors.New("empty array")
@@ -122,6 +122,18 @@ func MaxInd(a []float64) (int, error) {
     return ret, nil
 }
 
+func checkSaddlePoint(m *matrix.Matrix) (int, int, bool) {
+
+    a, ai := maxMin(m)
+    b, bi := minMax(m)
+
+    if a == b {
+        return ai, bi, true
+    }
+
+    return -1, -1, false
+}
+
 func initTable(t table.Writer) {
     t.SetTitle("Brown-Robinson method")
     t.AppendHeader(table.Row{"#", "_V", "V_", "EPSILON"})
@@ -136,9 +148,25 @@ func main() {
         m := HN(n)
         m.Display()
 
+        ai, bi, flag := checkSaddlePoint(m)
+
+        if flag {
+            fmt.Println("Есть седловая точка")
+
+            x := float64(ai) / float64(n)
+            y := float64(bi) / float64(n)
+
+            fmt.Printf("x = %.3f\n", x)
+            fmt.Printf("y = %.3f\n", y)
+            fmt.Printf("H = %.3f\n", Hxy(x, y))
+            continue
+        }
+
+        fmt.Println("Нет седловой точки")
+
         x, y, _ := brownrobinson.BrownRobinsonMethod(0.001, m, t)
-        xmi, _ := MaxInd(x)
-        ymi, _ := MaxInd(y)
+        xmi, _ := maxInd(x)
+        ymi, _ := maxInd(y)
 
         xf := float64(xmi) / float64(n)
         yf := float64(ymi) / float64(n)
