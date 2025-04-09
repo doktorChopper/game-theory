@@ -1,5 +1,7 @@
 github.com/doktorChopper/go-matrix v1.0.0 h1:hFGSTdR6VtwhOyuqXwhDkPu/oGjTWpdaA0n+3t9+35Y=
 github.com/doktorChopper/go-matrix v1.0.0/go.mod h1:eLxVd6C070XZFMFOYJxOCTE8pw5qPu6yF+1msGOFkfI=
+github.com/doktorChopper/go-matrix v1.0.1 h1:NmUNXBggrocr/04A2MxHcsUcuQyiosdnK6KZLPJPoT4=
+github.com/doktorChopper/go-matrix v1.0.1/go.mod h1:eLxVd6C070XZFMFOYJxOCTE8pw5qPu6yF+1msGOFkfI=
 github.com/jedib0t/go-pretty/v6 v6.6.7 h1:m+LbHpm0aIAPLzLbMfn8dc3Ht8MW7lsSO4MPItz/Uuo=
 github.com/jedib0t/go-pretty/v6 v6.6.7/go.mod h1:YwC5CE4fJ1HFUDeivSV1r//AmANFHyqczZk+U6BDALU=
 github.com/mattn/go-runewidth v0.0.16 h1:E5ScNMtiwvlvB5paMFdw9p4kSQzbXFikJ5SQO6TULQc=
