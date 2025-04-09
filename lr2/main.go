@@ -129,39 +129,44 @@ func initTable(t table.Writer) {
 
 func main() {
 
-    m := HN(2)
-    m.Display()
-
-    a, ia := MaxMin(m)
-    b, ib := MinMax(m)
-
-    fmt.Println("MaxMin: ", a, ia)
-    fmt.Println("MinMax: ", b, ib)
-
     t := table.NewWriter()
     initTable(t)
 
-    x, y, v := brownrobinson.BrownRobinsonMethod(0.001, m, t)
+    for n := 2; n <= 10; n++ {
+        m := HN(n)
+        m.Display()
 
-    fmt.Println(t.Render())
+        x, y, _ := brownrobinson.BrownRobinsonMethod(0.001, m, t)
+        xmi, _ := MaxInd(x)
+        ymi, _ := MaxInd(y)
 
-    prt := func(a []float64) {
-        for _, v := range a {
-            fmt.Printf("%.3f  ", v)
-        }
+        xf := float64(xmi) / float64(n)
+        yf := float64(ymi) / float64(n)
 
+        fmt.Printf("x = %.3f\n", xf)
+        fmt.Printf("y = %.3f\n", yf)
+        fmt.Printf("H = %.3f\n", Hxy(xf, yf))
+
+        fmt.Println()
         fmt.Println()
     }
 
-    prt(x)
-    prt(y)
 
-    xmi, _ := MaxInd(x)
-    ymi, _ := MaxInd(y)
 
-    fmt.Println(float64(xmi) / 2)
-    fmt.Println(float64(ymi) / 2)
+    // fmt.Println(t.Render())
 
-    fmt.Println(v)
+    // prt := func(a []float64) {
+    //     for _, v := range a {
+    //         fmt.Printf("%.3f  ", v)
+    //     }
+    //
+    //     fmt.Println()
+    // }
+    //
+    // prt(x)
+    // prt(y)
+    //
+    //
+    // fmt.Println(v)
 
 }
