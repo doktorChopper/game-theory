@@ -159,21 +159,20 @@ func main() {
             fmt.Printf("x = %.3f\n", x)
             fmt.Printf("y = %.3f\n", y)
             fmt.Printf("H = %.3f\n", Hxy(x, y))
-            continue
+        } else {
+            fmt.Println("Нет седловой точки")
+
+            x, y, _ := brownrobinson.BrownRobinsonMethod(0.001, m, t)
+            xmi, _ := maxInd(x)
+            ymi, _ := maxInd(y)
+
+            xf := float64(xmi) / float64(n)
+            yf := float64(ymi) / float64(n)
+
+            fmt.Printf("x = %.3f\n", xf)
+            fmt.Printf("y = %.3f\n", yf)
+            fmt.Printf("H = %.3f\n", Hxy(xf, yf))
         }
-
-        fmt.Println("Нет седловой точки")
-
-        x, y, _ := brownrobinson.BrownRobinsonMethod(0.001, m, t)
-        xmi, _ := maxInd(x)
-        ymi, _ := maxInd(y)
-
-        xf := float64(xmi) / float64(n)
-        yf := float64(ymi) / float64(n)
-
-        fmt.Printf("x = %.3f\n", xf)
-        fmt.Printf("y = %.3f\n", yf)
-        fmt.Printf("H = %.3f\n", Hxy(xf, yf))
 
         fmt.Println()
         fmt.Println()
