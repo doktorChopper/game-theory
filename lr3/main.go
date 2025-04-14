@@ -2,6 +2,8 @@ package main
 
 import (
 	"fmt"
+	"math"
+	"math/rand"
 )
 
 type Pair struct {
@@ -17,9 +19,10 @@ func (p *Pair) Second() int {
     return p.y
 } 
 
-func Pareto(m [][]Pair) []Pair {
+func Pareto(m [][]Pair) ([]Pair, []Pair) {
 
     s := []Pair{}
+    idxs := []Pair{}
     
     flag1 := true
     flag2 := false
@@ -53,18 +56,22 @@ func Pareto(m [][]Pair) []Pair {
 
             if flag1 && flag2 && flag3 {
                 s = append(s, m[i][j])
+                idxs = append(idxs, Pair{i, j})
             }
 
         }
 
     }
 
-    return s
+    return s, idxs
 }
 
-func Nash(m [][]Pair) []Pair {
+
+
+func Nash(m [][]Pair) ([]Pair, []Pair) {
 
     s := []Pair{}
+    idxs := []Pair{}
 
     flag := true
 
@@ -88,24 +95,46 @@ func Nash(m [][]Pair) []Pair {
 
             if flag {
                 s = append(s, m[i][j])
+                idxs = append(idxs, Pair{i, j})
             }
         }
     } 
 
-    return s
+    return s, idxs
+}
+
+func Search(p []Pair, i, j int) bool {
+
+    for _, v := range p {
+        if i == v.First() && j == v.Second() {
+            return true
+        }
+    }
+
+    return false
 }
 
 func main() {
 
-    // m := [][]Pair {
-    //     {Pair{-5, -5}, Pair{0, -10}},
-    //     {Pair{-10, 0}, Pair{-1, -1}},
-    // }
+    const (
+        green  = "\033[32m"
+        reset  = "\033[0m"
+    )
 
-    m := [][]Pair {
-        {Pair{4, 1}, Pair{0, 0}},
-        {Pair{0, 0}, Pair{1, 4}},
+    prisoner := [][]Pair {
+        {Pair{-5, -5}, Pair{0, -10}},
+        {Pair{-10, 0}, Pair{-1, -1}},
     }
+
+    // family := [][]Pair {
+    //     {Pair{4, 1}, Pair{0, 0}},
+    //     {Pair{0, 0}, Pair{1, 4}},
+    // }
+    //
+    // cross := [][]Pair {
+    //     {Pair{1, 1}, Pair{1, 2}},
+    //     {Pair{1, 2}, Pair{1, 1}},
+    // }
 
     // m := [][]Pair {
     //     {Pair{24, 32}, Pair{2, 2}, Pair{40, 17}, Pair{-46, -29}, Pair{27, -42}, Pair{-46, -8}, Pair{35, -20}, Pair{-23, -16}, Pair{-33, 12}, Pair{-50, -1}},
@@ -120,17 +149,72 @@ func main() {
     //     {Pair{46, -49}, Pair{9, -5}, Pair{28, 36}, Pair{-38, 24}, Pair{-11, -39}, Pair{32, -41}, Pair{9, -13}, Pair{42, 10}, Pair{19, -18}, Pair{37, 4}},
     // }
 
+
+    m := make([][]Pair, 10)
+    for i := range m {
+        m[i] = make([]Pair, 10)
+    }
+
     for i := range m {
         for j := range m[i] {
-            fmt.Printf("(%v, %v)    ", m[i][j].First(), m[i][j].Second())
+            m[i][j] = Pair{int(math.Pow(-1, float64(rand.Intn(2)))) * rand.Intn(51), int(math.Pow(-1, float64(rand.Intn(2)))) * rand.Intn(51)}
+        }
+    }
+
+    pn, idxsPP := Nash(prisoner)
+    fmt.Printf("********** Prisoner **********\n\n")
+    fmt.Println("Nash: ", pn)
+
+    for i := range prisoner {
+        for j := range prisoner[i] {
+           
+            if Search(idxsPP, i, j) {
+                fmt.Printf("%s(%-3v, %-3v)%s     ", green, prisoner[i][j].First(), prisoner[i][j].Second(), reset)
+            } else {
+                fmt.Printf("(%-3v, %-3v)     ", prisoner[i][j].First(), prisoner[i][j].Second())
+            }
+
         }
 
         fmt.Println()
     }
 
-    // rn := Nash(m)
-    // fmt.Println(rn)
+    rn, idxsRN := Nash(m)
+    fmt.Printf("********** Random Matrix **********\n\n")
+    fmt.Println("Nash: ", rn)
 
-    rp := Pareto(m)
-    fmt.Println(rp)
+
+    for i := range m {
+        for j := range m[i] {
+            
+            if Search(idxsRN, i, j) {
+                fmt.Printf("%s(%-3v, %-3v)%s     ", green, m[i][j].First(), m[i][j].Second(), reset)
+            } else {
+                fmt.Printf("(%-3v, %-3v)     ", m[i][j].First(), m[i][j].Second())
+            }
+
+        }
+
+        fmt.Println()
+    }
+
+    fmt.Println()
+    fmt.Println()
+
+    rp, idxsRP := Pareto(m)
+    fmt.Println("Pareto: ", rp)
+
+    for i := range m {
+        for j := range m[i] {
+            
+            if Search(idxsRP, i, j) {
+                fmt.Printf("%s(%-3v, %-3v)%s     ", green, m[i][j].First(), m[i][j].Second(), reset)
+            } else {
+                fmt.Printf("(%-3v, %-3v)     ", m[i][j].First(), m[i][j].Second())
+            }
+
+        }
+
+        fmt.Println()
+    }
 }
