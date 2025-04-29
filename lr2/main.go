@@ -139,6 +139,26 @@ func initTable(t table.Writer) {
     t.AppendHeader(table.Row{"#", "_V", "V_", "EPSILON"})
 }
 
+func fxy(x, y float64, c []float64) float64 {
+    return c[0] * x * x + c[1] * y * y + c[2] * x * y + c[3] * x + c[4] * y
+}
+
+type F func(float64, float64, []float64) float64
+
+// func derfx(f F, x, y, h float64, c []float64) float64 {
+//
+//     return 
+// }
+//
+// func derfy(f F, x, y, h float64, c []float64) float64 {
+//
+// }
+
+func AnalyticalSolution() {
+
+
+}
+
 func main() {
 
     t := table.NewWriter()
