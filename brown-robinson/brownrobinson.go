@@ -1,6 +1,7 @@
 package brownrobinson
 
 import (
+	"fmt"
 	"math"
 	"math/rand"
 
@@ -83,15 +84,20 @@ func BrownRobinsonMethod(e float64, mat *matrix.Matrix, t table.Writer) ([]float
 
     q, eq1 := vkMax(yk, mat, 1)
     w, eq2 := vkMin(xk, mat, 1)
+    
+    rsx := randStrateghy(eq1)
+    rsy := randStrateghy(eq2)
 
-    xk[randStrateghy(eq1)] += 1
-    yk[randStrateghy(eq2)] += 1
+    xk[rsx] += 1
+    yk[rsy] += 1
 
     epsilon := q - w
 
     i := 1
 
-    t.AppendRow(table.Row{i, 
+    t.AppendRow(table.Row{i,
+        fmt.Sprintf("x%d", rsx + 1),
+        fmt.Sprintf("y%d", rsy + 1),
         math.Round(q * 100) / 100, 
         math.Round(w * 100) / 100, 
         math.Round(epsilon * 100) / 100})
@@ -109,12 +115,17 @@ func BrownRobinsonMethod(e float64, mat *matrix.Matrix, t table.Writer) ([]float
             w = l
         }
 
-        xk[randStrateghy(eq1)] += 1
-        yk[randStrateghy(eq2)] += 1
+        rsx := randStrateghy(eq1)
+        rsy := randStrateghy(eq2)
+
+        xk[rsx] += 1
+        yk[rsy] += 1
 
         epsilon = q - w
 
         t.AppendRow(table.Row{i + 1, 
+            fmt.Sprintf("x%d", rsx + 1),
+            fmt.Sprintf("y%d", rsy + 1),
             math.Round(k * 100) / 100, 
             math.Round(l * 100) / 100, 
             math.Round(epsilon * 100) / 100})
@@ -132,7 +143,6 @@ func BrownRobinsonMethod(e float64, mat *matrix.Matrix, t table.Writer) ([]float
     for _, v := range yk {
         retyk = append(retyk, float64(v) / float64(i + 1))
     }
-
 
     return retxk, retyk, (q + w) / 2
 }
