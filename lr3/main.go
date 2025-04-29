@@ -4,18 +4,20 @@ import (
 	"fmt"
 	"math"
 	"math/rand"
+
+	"github.com/doktorChopper/go-matrix/matrix"
 )
 
 type Pair struct {
-    x int
-    y int
+    x float64
+    y float64
 }
 
-func (p *Pair) First() int {
+func (p *Pair) First() float64 {
     return p.x
 }
 
-func (p *Pair) Second() int {
+func (p *Pair) Second() float64 {
     return p.y
 } 
 
@@ -56,7 +58,7 @@ func Pareto(m [][]Pair) ([]Pair, []Pair) {
 
             if flag1 && flag2 && flag3 {
                 s = append(s, m[i][j])
-                idxs = append(idxs, Pair{i, j})
+                idxs = append(idxs, Pair{float64(i), float64(j)})
             }
 
         }
@@ -95,7 +97,7 @@ func Nash(m [][]Pair) ([]Pair, []Pair) {
 
             if flag {
                 s = append(s, m[i][j])
-                idxs = append(idxs, Pair{i, j})
+                idxs = append(idxs, Pair{float64(i), float64(j)})
             }
         }
     } 
@@ -106,12 +108,19 @@ func Nash(m [][]Pair) ([]Pair, []Pair) {
 func Search(p []Pair, i, j int) bool {
 
     for _, v := range p {
-        if i == v.First() && j == v.Second() {
+        if i == int(v.First()) && j == int(v.Second()) {
             return true
         }
     }
 
     return false
+}
+
+func Solution2() {
+    // mat := [][]Pair {
+    //     {Pair{6, 8}, Pair{7, 4}},
+    //     {Pair{0, 1}, Pair{9, 3}},
+    // }
 }
 
 func main() {
@@ -121,18 +130,25 @@ func main() {
         reset  = "\033[0m"
     )
 
-    prisoner := [][]Pair {
-        {Pair{-5, -5}, Pair{0, -10}},
-        {Pair{-10, 0}, Pair{-1, -1}},
+    printMatrix := func(m [][]Pair, idxs []Pair) {
+        for i := range m {
+            for j := range m[i] {
+
+                if Search(idxs, i, j) {
+                    fmt.Printf("%s(%-3.0f, %-3.0f)%s     ", green, m[i][j].First(), m[i][j].Second(), reset)
+                } else {
+                    fmt.Printf("(%-3.0f, %-3.0f)     ", m[i][j].First(), m[i][j].Second())
+                }
+
+            }
+            fmt.Println()
+        }
+        fmt.Println()
+        fmt.Println()
     }
 
-    //
-    // cross := [][]Pair {
-    //     {Pair{1, 1}, Pair{1, 2}},
-    //     {Pair{1, 2}, Pair{1, 1}},
-    // }
 
-    // m := [][]Pair {
+    // mat := [][]Pair {
     //     {Pair{24, 32}, Pair{2, 2}, Pair{40, 17}, Pair{-46, -29}, Pair{27, -42}, Pair{-46, -8}, Pair{35, -20}, Pair{-23, -16}, Pair{-33, 12}, Pair{-50, -1}},
     //     {Pair{-40, -11}, Pair{28, -22}, Pair{-15, -47}, Pair{38, 49}, Pair{26, -25}, Pair{-38, 26}, Pair{-35, 35}, Pair{-26, 30}, Pair{-37, 23}, Pair{-19, -30}},
     //     {Pair{-1, 46}, Pair{-36, -14}, Pair{30, -17}, Pair{-35, 5}, Pair{4, -22}, Pair{7, -33}, Pair{17, -2}, Pair{-6, -15}, Pair{-8, -48}, Pair{-33, -14}},
@@ -145,23 +161,55 @@ func main() {
     //     {Pair{46, -49}, Pair{9, -5}, Pair{28, 36}, Pair{-38, 24}, Pair{-11, -39}, Pair{32, -41}, Pair{9, -13}, Pair{42, 10}, Pair{19, -18}, Pair{37, 4}},
     // }
 
-    printMatrix := func(m [][]Pair, idxs []Pair) {
-        for i := range m {
-            for j := range m[i] {
-
-                if Search(idxs, i, j) {
-                    fmt.Printf("%s(%-3v, %-3v)%s     ", green, m[i][j].First(), m[i][j].Second(), reset)
-                } else {
-                    fmt.Printf("(%-3v, %-3v)     ", m[i][j].First(), m[i][j].Second())
-                }
-
-            }
-            fmt.Println()
-        }
-        fmt.Println()
-        fmt.Println()
+    prisoner := [][]Pair {
+        {Pair{-5, -5}, Pair{0, -10}},
+        {Pair{-10, 0}, Pair{-1, -1}},
     }
 
+    fmt.Println()
+
+    pn, idxsPN := Nash(prisoner)
+    fmt.Printf("********** Prisoner **********\n\n")
+    fmt.Println("Nash: ", pn)
+    fmt.Println()
+    printMatrix(prisoner, idxsPN)
+
+    pp, idxsPP := Pareto(prisoner)
+    fmt.Println("Pareto: ", pp)
+    fmt.Println() 
+    printMatrix(prisoner, idxsPP)
+
+    family := [][]Pair {
+        {Pair{4, 1}, Pair{0, 0}},
+        {Pair{0, 0}, Pair{1, 4}},
+    }
+
+    fn, idxsFN := Nash(family)
+    fmt.Printf("********** Family **********\n\n")
+    fmt.Println("Nash: ", fn)
+    fmt.Println()
+    printMatrix(family, idxsFN)
+
+    fp, idxsFP := Pareto(family)
+    fmt.Println("Pareto: ", fp)
+    fmt.Println()
+    printMatrix(family, idxsFP)
+
+    cross := [][]Pair {
+        {Pair{1, 1}, Pair{1 - 1e-10, 2}},
+        {Pair{2, 1 - 1e-10}, Pair{0, 0}},
+    }
+
+    cn, idxsCN := Nash(cross)
+    fmt.Printf("********** Cross **********\n\n")
+    fmt.Println("Nash: ", cn)
+    fmt.Println()
+    printMatrix(cross, idxsCN)
+
+    cp, idxsCP := Pareto(cross)
+    fmt.Println("Pareto: ", cp)
+    fmt.Println()
+    printMatrix(cross, idxsCP)
 
     mat := make([][]Pair, 10)
     for i := range mat {
@@ -170,76 +218,35 @@ func main() {
 
     for i := range mat {
         for j := range mat[i] {
-            mat[i][j] = Pair{int(math.Pow(-1, float64(rand.Intn(2)))) * rand.Intn(51), int(math.Pow(-1, float64(rand.Intn(2)))) * rand.Intn(51)}
+            mat[i][j] = Pair{float64(int(math.Pow(-1, float64(rand.Intn(2)))) * rand.Intn(51)), float64(int(math.Pow(-1, float64(rand.Intn(2)))) * rand.Intn(51))}
         }
     }
-
-    pn, idxsPP := Nash(prisoner)
-    fmt.Printf("********** Prisoner **********\n\n")
-    fmt.Println("Nash: ", pn)
-
-    for i := range prisoner {
-        for j := range prisoner[i] {
-           
-            if Search(idxsPP, i, j) {
-                fmt.Printf("%s(%-3v, %-3v)%s     ", green, prisoner[i][j].First(), prisoner[i][j].Second(), reset)
-            } else {
-                fmt.Printf("(%-3v, %-3v)     ", prisoner[i][j].First(), prisoner[i][j].Second())
-            }
-
-        }
-
-        fmt.Println()
-    }
-
-
-    fmt.Println()
-    fmt.Println()
-
-    // family := [][]Pair {
-    //     {Pair{4, 1}, Pair{0, 0}},
-    //     {Pair{0, 0}, Pair{1, 4}},
-    // }
 
     rn, idxsRN := Nash(mat)
     fmt.Printf("********** Random Matrix **********\n\n")
     fmt.Println("Nash: ", rn)
-
-
-
-    for i := range mat {
-        for j := range mat[i] {
-            
-            if Search(idxsRN, i, j) {
-                fmt.Printf("%s(%-3v, %-3v)%s     ", green, mat[i][j].First(), mat[i][j].Second(), reset)
-            } else {
-                fmt.Printf("(%-3v, %-3v)     ", mat[i][j].First(), mat[i][j].Second())
-            }
-
-        }
-
-        fmt.Println()
-    }
-
     fmt.Println()
-    fmt.Println()
+    printMatrix(mat, idxsRN)
+
 
     rp, idxsRP := Pareto(mat)
     fmt.Println("Pareto: ", rp)
-
+    fmt.Println()
     printMatrix(mat, idxsRP)
 
-    // for i := range mat {
-    //     for j := range mat[i] {
-    //
-    //         if Search(idxsRP, i, j) {
-    //             fmt.Printf("%s(%-3v, %-3v)%s     ", green, mat[i][j].First(), mat[i][j].Second(), reset)
-    //         } else {
-    //             fmt.Printf("(%-3v, %-3v)     ", mat[i][j].First(), mat[i][j].Second())
-    //         }
-    //
-    //     }
-    //
-    //     fmt.Println()
+
+    // mat := [][]Pair {
+    //     {Pair{6, 8}, Pair{7, 4}},
+    //     {Pair{0, 1}, Pair{9, 3}},
     // }
+
+    mat2 := [][]float64 {
+        {1, 4},
+        {8, 3},
+    }
+
+    Mmat2 := matrix.NewMatrixFromSlice(mat2)
+
+    Mmat2.InverseMatrix().Display()
+
 }
