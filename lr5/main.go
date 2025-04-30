@@ -1,6 +1,10 @@
 package main
 
-import "fmt"
+import (
+	"fmt"
+	"strconv"
+	"strings"
+)
 
 // Test
 
@@ -86,11 +90,17 @@ func CheckSuperAdditive(a [len(I)]uint8) bool {
         for j := i + 1; j < len(a); j++ {
             if !HasIntersection(a[i], a[j]) {
                 if vFunc[Union(a[i], a[j])] < vFunc[a[i]] + vFunc[a[j]] {
+                    w := IntSliceToString(BinToArr(Union(a[i], a[j])))
+                    fmt.Printf("%2d = %-17s%-5s%d + %d\n", vFunc[Union(a[i], a[j])], "v(" + w + ")", "<", vFunc[a[i]], vFunc[a[j]])
                     return false
                 }
+
+                // w := IntSliceToString(BinToArr(Union(a[i], a[j])))
+                // fmt.Printf("%2d = %-17s%-5s%d + %d\n", vFunc[Union(a[i], a[j])], "v(" + w + ")", ">=", vFunc[a[i]], vFunc[a[j]])
             }
         }
     }
+    fmt.Println()
 
     return true
 }
@@ -100,8 +110,16 @@ func CheckConvexity(a [len(I)]uint8) bool {
     for i := 0; i < len(a); i++ {
         for j := 0; j < len(a); j++ {
             if vFunc[Union(a[i], a[j])] + vFunc[Intersection(a[i], a[j])] < vFunc[a[i]] + vFunc[a[j]] {
+                p := IntSliceToString(BinToArr(Union(a[i], a[j])))
+                q := IntSliceToString(BinToArr(Intersection(a[i], a[j])))
+
+                fmt.Printf("%-27s = %d + %d %s %d + %d\n","v(" + p + ") + v(" + q + ")", vFunc[Union(a[i], a[j])], vFunc[Intersection(a[i], a[j])], "<", vFunc[a[i]], vFunc[a[j]])
                 return false
             }
+            // p := IntSliceToString(BinToArr(Union(a[i], a[j])))
+            // q := IntSliceToString(BinToArr(Intersection(a[i], a[j])))
+
+            // fmt.Printf("%-27s = %d + %d %s %d + %d\n","v(" + p + ") + v(" + q + ")", vFunc[Union(a[i], a[j])], vFunc[Intersection(a[i], a[j])], ">=", vFunc[a[i]], vFunc[a[j]])
         }
     }
 
@@ -153,12 +171,93 @@ func VectorShapley(a [len(I)]uint8) []float64 {
     return r
 }
 
-func main() {
+func CheckGroupRationalization(a []float64) bool {
+
+    sum := 0.0
+
+    for i, v := range a {
+        if i == len(a) - 1 {
+            fmt.Printf("%.2f ", v)
+        } else {
+            fmt.Printf("%.2f + ", v)
+        }
+        sum += v
+    }
+
+    if sum == float64(vFunc[uint8(len(I) - 1)]) {
+        fmt.Printf("== %d\n", vFunc[uint8(len(I) - 1)])
+        return true
+    }
+
+    fmt.Printf("!= %d\n", vFunc[uint8(len(I) - 1)])
+    return false
+}
+
+func CheckIndividualRationalization(a []float64) bool {
+
+    for i := range a {
+        if a[i] < float64(vFunc[1 << i]) {
+            fmt.Printf("x%d = %.2f < v({%d}) = %d\n\n", i + 1, a[i], i + 1, vFunc[1 << i])
+            return false
+        }
+        fmt.Printf("x%d = %.2f >= v({%d}) = %d\n", i + 1, a[i], i + 1, vFunc[1 << i])
+    }
+    fmt.Println()
+
+    return true
+}
+
+func BinToArr(b uint8) []int {
+
+    r := []int{}
     
-    fmt.Println(CheckSuperAdditive(I))
-    fmt.Println(CheckConvexity(I))
+    for i := 0; i < N; i++ {
+        if 1 << i & b != 0 {
+            r = append(r, i + 1)
+        }
+    }
 
-    fmt.Println(VectorShapley(I))
+    return r
+}
 
-    fmt.Println("Hello, World!")
+func IntSliceToString(a []int) string {
+
+    str := make([]string, len(a))
+
+    for i := range a {
+        str[i] = strconv.Itoa(a[i])
+    }
+
+    return "{" + strings.Join(str, ", ") + "}"
+}
+
+func main() {
+
+    fmt.Println()
+    fmt.Println("===== Характеристическая функция =====")
+    fmt.Println()
+
+    for _, v := range I {
+        fmt.Printf("%-15s%-5s%-10v\n", IntSliceToString(BinToArr(v)), "-->", vFunc[v])
+    } 
+    fmt.Println()
+    
+    fmt.Printf("Является супераддитивной: %v\n", CheckSuperAdditive(I))
+    fmt.Println()
+    fmt.Printf("Является выпуклой: %v\n", CheckConvexity(I))
+    fmt.Println()
+
+    vec := VectorShapley(I)
+
+    fmt.Print("Вектор Шепли: [ ")
+    for _, v := range vec {
+        fmt.Printf("%.2f ", v)
+    }
+    fmt.Println("]")
+    fmt.Println()
+
+    fmt.Printf("Условие групповой рационализации: %v\n", CheckGroupRationalization(vec))
+    fmt.Println()
+    fmt.Printf("Условие индивидуальной рационализации: %v\n", CheckIndividualRationalization(vec))
+    fmt.Println()
 }
