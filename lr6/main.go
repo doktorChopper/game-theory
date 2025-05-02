@@ -2,7 +2,9 @@ package main
 
 import (
 	"fmt"
+	"math"
 	"math/rand"
+	"sort"
 	"time"
 )
 
@@ -67,8 +69,10 @@ func MinSlice(a []float64) float64 {
 
 func main() {
 
-
     rand.New(rand.NewSource(time.Now().UnixNano()))
+
+    /*
+
 
     Test := [][]float64 {
         {0.111, 0.178, 0.003, 0.074, 0.152, 0.131, 0.145, 0.101, 0.104},
@@ -96,6 +100,8 @@ func main() {
 
     fmt.Println(TestXt)
 
+    */
+
     // TestX0 := []int {15, 14, 19, 8, 12, 1, 16, 11, 17}
 
 
@@ -107,7 +113,6 @@ func main() {
     agents := []int{1, 2, 3, 4, 5, 6, 7, 8, 9, 10}
 
     var agentNumA int
-    fmt.Println("go agentNumA")
     for {
         agentNumA = rand.Intn(len(agents))
         if agentNumA != 0 && agentNumA != 10 {
@@ -118,7 +123,6 @@ func main() {
     // Выбор рандомного подмножества агентов для игрока B, непересекающегося с множеством агентов для игрока А
 
     var agentNumB int
-    fmt.Println("go agentNumB")
     for {
         agentNumB = rand.Intn(len(agents) - agentNumA)
         if agentNumB == 0 {
@@ -137,7 +141,10 @@ func main() {
         agents = append(agents[:idx], agents[idx + 1:]...)
         agentNumA--
     }
-    fmt.Println(agentsA)
+    sort.Slice(agentsA, func(i int, j int) bool {
+        return agentsA[i] < agentsA[j]
+    })
+    fmt.Printf("agents A: %v\n", agentsA)
 
     agentsB := []int{}
     for agentNumB > 0 {
@@ -147,7 +154,11 @@ func main() {
         agentNumB--
     }
 
-    fmt.Println(agentsB)
+    sort.Slice(agentsB, func(i int, j int) bool {
+        return agentsB[i] < agentsB[j]
+    })
+    fmt.Printf("agents B: %v\n", agentsB)
+    fmt.Println()
 
     // Герератор вектора начальных мнений агентов
 
@@ -155,6 +166,12 @@ func main() {
     for i := range x0 {
         x0[i] = float64(rand.Intn(50))
     }
+
+    fmt.Printf("x(0) = [  ")
+    for _, v := range x0 {
+        fmt.Printf("%.3f  ", v)
+    }
+    fmt.Println("]")
 
     epsilon := 1e-6
 
@@ -182,19 +199,21 @@ func main() {
         fmt.Printf("%.3f  ", v)
     }
     fmt.Println("]")
+    fmt.Println()
 
     u := rand.Intn(100)
     v := rand.Intn(100) - 100
 
     fmt.Printf("u = %d\n", u)
     fmt.Printf("v = %d\n", v)
+    fmt.Println()
 
-    for _, v := range agentsA {
-        x0[v - 1] = float64(u)
+    for _, x := range agentsA {
+        x0[x - 1] = float64(u)
     }
 
-    for _, v := range agentsB {
-        x0[v - 1] = float64(v)
+    for _, x := range agentsB {
+        x0[x - 1] = float64(v)
     }
 
     fmt.Printf("x(0) = [  ")
@@ -202,4 +221,31 @@ func main() {
         fmt.Printf("%.3f  ", v)
     }
     fmt.Println("]")
+
+    t = 1
+    e = MaxSlice(x0) - MinSlice(x0)
+    copy(xt, x0)
+    for e > epsilon {
+        for i := 0; i < len(A); i++ {
+            x := 0.0
+            for j := 0; j < len(A); j++ {
+                x += A[i][j] * xt[j]
+            }
+            xt[i] = x
+        }
+        e = MaxSlice(xt) - MinSlice(xt)
+        t += 1
+    }
+
+    fmt.Printf("x(%d) = [  ", t)
+    for _, v := range xt {
+        fmt.Printf("%.3f  ", v)
+    }
+    fmt.Println("]")
+
+    if math.Abs(float64(u) - xt[0]) > math.Abs(float64(v) - xt[0]) {
+        fmt.Println("Победил второй игрок")
+    } else {
+        fmt.Println("Победил первый игрок")
+    }
 }
