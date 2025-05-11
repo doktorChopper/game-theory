@@ -34,21 +34,21 @@ import (
 
 var vFunc = map[uint8]int {
     0b00000000: 0,
-    0b00000001: 2,
+    0b00000001: 3,
     0b00000010: 1,
-    0b00000011: 4,
-    0b00000100: 1,
+    0b00000011: 2,
+    0b00000100: 4,
     0b00000101: 4,
-    0b00000110: 2,
-    0b00000111: 7,
-    0b00001000: 2,
-    0b00001001: 4,
-    0b00001010: 4,
-    0b00001011: 8,
-    0b00001100: 4,
-    0b00001101: 8,
-    0b00001110: 6,
-    0b00001111: 10,
+    0b00000110: 5,
+    0b00000111: 8,
+    0b00001000: 3,
+    0b00001001: 5,
+    0b00001010: 6,
+    0b00001011: 7,
+    0b00001100: 10,
+    0b00001101: 11,
+    0b00001110: 8,
+    0b00001111: 13,
 }
 
 var I = [...]uint8 {
@@ -91,7 +91,9 @@ func CheckSuperAdditive(a [len(I)]uint8) bool {
             if !HasIntersection(a[i], a[j]) {
                 if vFunc[Union(a[i], a[j])] < vFunc[a[i]] + vFunc[a[j]] {
                     w := IntSliceToString(BinToArr(Union(a[i], a[j])))
-                    fmt.Printf("%2d = %-17s%-5s%d + %d\n", vFunc[Union(a[i], a[j])], "v(" + w + ")", "<", vFunc[a[i]], vFunc[a[j]])
+                    fmt.Printf("%2d = %-17s%-5s%d + %d\n", vFunc[Union(a[i], a[j])], "v(" + w + ")", ">=", vFunc[a[i]], vFunc[a[j]])
+                    fmt.Println(a[i])
+                    fmt.Println(a[j])
                     return false
                 }
 
