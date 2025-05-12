@@ -12,9 +12,15 @@ import (
 
 func Hxy(x, y float64) float64 {
 
+    // H := [][]float64 {
+    //     {0.0, -(72.0 / 25.0), 3.0 / 2.0},
+    //     {-(18.0 / 50.0), 18.0 / 5.0, 0.0},
+    //     {-3.0, 0.0, 0.0},
+    // }
+
     H := [][]float64 {
-        {0.0, -(72.0 / 25.0), 3.0 / 2.0},
-        {-(18.0 / 50.0), 18.0 / 5.0, 0.0},
+        {0.0, -(81.0 / 5.0), 9.0},
+        {-(9.0 / 5.0), 18.0, 0.0},
         {-3.0, 0.0, 0.0},
     }
 
@@ -156,7 +162,58 @@ type F func(float64, float64, []float64) float64
 
 func AnalyticalSolution() {
 
+    vec := []float64 {-3.0, 9.0, 18.0, -(9.0 / 5.0), -(81.0 / 5.0)}
+    // vec := []float64 {-(3.0), 3.0 / 2.0, 18.0 / 5.0, -(18.0 / 50.0), -(72.0 / 25.0)}
 
+    fmt.Printf("H = %v\n", vec)
+    fmt.Println()
+    fmt.Printf("H(x, y) = %.2fx\u00B2 + %.2fy\u00B2 + %.2fxy + %.2fx + %.2fy\n", vec[0], vec[1], vec[2], vec[3], vec[4])
+    fmt.Println()
+    fmt.Printf("Hx = 2 * %.2fx + %.2fy + %.2f\n", vec[0], vec[2], vec[3])
+    fmt.Printf("Hy = 2 * %.2fy + %.2fx + %.2f\n", vec[1], vec[2], vec[4])
+    fmt.Println()
+    fmt.Printf("Hxx = 2a = %.2f < 0\n", 2.0 * vec[0])
+    fmt.Printf("Hyy = 2b = %.2f > 0\n", 2.0 * vec[1])
+    fmt.Println()
+
+    tmp := (vec[2] * vec[3] - 2 * vec[0] * vec[4]) / (4 * vec[0] * vec[1] - vec[2] * vec[2])
+
+    if 2 * vec[0] < 0 && 2 * vec[1] > 0 {
+        fmt.Println("Игра является выпукло-вогнутой")
+    } else {
+        fmt.Println("Игра НЕ является выпукло-вогнутой")
+    }
+    fmt.Println()
+
+    x := func(y float64) float64 {
+        if y < -(vec[3] / vec[2]) {
+            return 0
+        }
+        return -(vec[2] * y + vec[3]) / (2 * vec[0])
+    }
+
+    y := func(x float64) float64 {
+        if x > -(vec[4] / vec[2]) {
+            return 0
+        }
+        return -(vec[2] * x + vec[4]) / (2 * vec[1])
+    }
+
+    xa := x(tmp)
+    ya := y(xa)
+    fmt.Printf("x = %.3f\n", x(ya))
+    fmt.Printf("y = %.3f\n", y(xa))
+    fmt.Printf("H = %.3f\n", Hxy(x(ya), y(xa)))
+}
+
+func PrintMatrix(m *matrix.Matrix) {
+    for i := range m.Rows() {
+        for j := range m.Cols() {
+            fmt.Printf("%-5.3f\t", m.GetAt(i, j))
+        }
+        fmt.Println()
+    }
+    fmt.Println()
 }
 
 func main() {
@@ -164,9 +221,15 @@ func main() {
     t := table.NewWriter()
     initTable(t)
 
+    fmt.Println()
+    fmt.Println("********** Numerical solution **********")
+    fmt.Println()
+
     for n := 2; n <= 10; n++ {
+        fmt.Printf("N = %d\n", n)
         m := HN(n)
-        m.Display()
+        // m.Display()
+        PrintMatrix(m)
 
         ai, bi, flag := checkSaddlePoint(m)
 
@@ -199,6 +262,9 @@ func main() {
     }
 
 
+    fmt.Println("********** Analytical solution **********")
+    fmt.Println()
+    AnalyticalSolution()
 
     // fmt.Println(t.Render())
 
