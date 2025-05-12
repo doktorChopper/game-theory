@@ -202,13 +202,23 @@ func main() {
 
     cn, idxsCN := Nash(cross)
     fmt.Printf("********** Cross **********\n\n")
-    fmt.Println("Nash: ", cn)
+    // fmt.Println("Nash: ", cn)
+    fmt.Print("Nash: [")
+    for _, v := range cn {
+        fmt.Printf("%.2f ", v)
+    }
+    fmt.Printf("]\n")
     fmt.Println()
     printMatrix(cross, idxsCN)
 
     cp, idxsCP := Pareto(cross)
-    fmt.Println("Pareto: ", cp)
+    fmt.Print("Pareto: [")
+    for _, v := range cp {
+        fmt.Printf("%.2f ", v)
+    }
+    fmt.Printf("]\n")
     fmt.Println()
+
     printMatrix(cross, idxsCP)
 
     mat := make([][]Pair, 10)
@@ -235,18 +245,87 @@ func main() {
     printMatrix(mat, idxsRP)
 
 
-    // mat := [][]Pair {
-    //     {Pair{6, 8}, Pair{7, 4}},
-    //     {Pair{0, 1}, Pair{9, 3}},
-    // }
-
-    mat2 := [][]float64 {
-        {1, 4},
-        {8, 3},
+    mat2 := [][]Pair {
+        {Pair{6, 8}, Pair{7, 4}},
+        {Pair{0, 1}, Pair{9, 3}},
     }
 
-    Mmat2 := matrix.NewMatrixFromSlice(mat2)
+    // mat2 := [][]Pair {
+    //     {Pair{0, 1}, Pair{11, 4}},
+    //     {Pair{7, 8}, Pair{6, 3}},
+    // }
 
-    Mmat2.InverseMatrix().Display()
+    Amat2 := make([][]float64, 2)
+    Amat2[0] = make([]float64, 2)
+    Amat2[1] = make([]float64, 2)
+
+    Bmat2 := make([][]float64, 2)
+    Bmat2[0] = make([]float64, 2)
+    Bmat2[1] = make([]float64, 2)
+
+    fmt.Printf("********** B-Matrix **********\n\n")
+    for i := range mat2 {
+        for j := range mat2[i] {
+            Amat2[i][j] = mat2[i][j].First()
+            Bmat2[i][j] = mat2[i][j].Second()
+        }
+        fmt.Println()
+    }
+
+    bn, idxsBM := Nash(mat2)
+    fmt.Println("Nash: ", bn)
+    fmt.Println()
+    printMatrix(mat2, idxsBM)
+    
+    printMatrix2 := func(m *matrix.Matrix) {
+        for i := range m.Rows() {
+            for j := range m.Cols() {
+                fmt.Printf("%.3f ", m.GetAt(i, j))
+            }
+            fmt.Println()
+        }
+        fmt.Println()
+    }
+
+    // printMatrix2(mat2)
+
+    Amat2M := matrix.NewMatrixFromSlice(Amat2)
+    Bmat2M := matrix.NewMatrixFromSlice(Bmat2)
+    
+    fmt.Println("A matrix:")
+    Amat2M.Display()
+    fmt.Println("B matrix:")
+    Bmat2M.Display()
+
+    aI := Amat2M.InverseMatrix()
+    bI := Bmat2M.InverseMatrix()
+
+    fmt.Println("A inverse matrix:")
+    aI.Display()
+    fmt.Println("B inverse matrix:")
+    bI.Display()
+
+    u := matrix.NewMatrixFromSlice([][]float64{{1, 1}})
+    uT := u.Transposition()
+
+    v1 := 1 / u.Mult(aI).Mult(uT).GetAt(0, 0)
+    v2 := 1 / u.Mult(bI).Mult(uT).GetAt(0, 0)
+
+    fmt.Printf("v1 = %.3f\n", v1)
+    fmt.Printf("v2 = %.3f\n", v2)
+    fmt.Println()
+
+    x := u.Mult(bI)
+    x.ScalarMult(v2)
+
+    y := aI.Mult(uT)
+    y.ScalarMult(v1)
+
+    // x.Display()
+    fmt.Print("x = ")
+    printMatrix2(x)
+
+    fmt.Print("y = ")
+    printMatrix2(y.Transposition())
 
 }
