@@ -33,6 +33,8 @@ type Tree struct {
 var leaves []*node = []*node{}
 const depth int = 5
 
+var R int = 0
+
 func add(p byte, d int, n *node, par *node, g *gographviz.Graph) *node {
     if d == depth {
         // c := make([]int, 2)
@@ -43,8 +45,9 @@ func add(p byte, d int, n *node, par *node, g *gographviz.Graph) *node {
         c = append(c, []int{int(math.Pow(-1, float64(rand.Intn(2)))) * rand.Intn(21), int(math.Pow(-1, float64(rand.Intn(2)))) * rand.Intn(21)})
 
 
-        r := strconv.Itoa(rand.Intn(1000000))
-        label := fmt.Sprintf("\"%s\\n%s\\n(%d, %d)\"", string(p), r, c[0][0], c[0][1])
+        r := strconv.Itoa(R)
+        R++
+        label := fmt.Sprintf("\"\\n%s\\n(%d, %d)\"",r, c[0][0], c[0][1])
         attrs := map[string]string {
             "label": label,
         }
@@ -75,7 +78,9 @@ func add(p byte, d int, n *node, par *node, g *gographviz.Graph) *node {
             size = 3
         }
 
-        r := strconv.Itoa(rand.Intn(1000000))
+        r := strconv.Itoa(R)
+        R++
+
         label := fmt.Sprintf("\"%s\\n%s\"", string(p), r)
         attrs := map[string]string {
             "label": label,
@@ -138,9 +143,9 @@ func ReverseInductionMethod(g *gographviz.Graph) {
                 maxc := u.costs[0]
                 var idx int
                 if u.player == 'A' {
-                    idx = 0
-                } else {
                     idx = 1
+                } else {
+                    idx = 0
                 }
                 // r := u
                 tmp := u
