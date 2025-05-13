@@ -2,8 +2,8 @@ package main
 
 import (
 	"fmt"
-	"math"
-	"math/rand"
+	// "math"
+	// "math/rand"
 
 	"github.com/doktorChopper/go-matrix/matrix"
 )
@@ -75,27 +75,34 @@ func Nash(m [][]Pair) ([]Pair, []Pair) {
     s := []Pair{}
     idxs := []Pair{}
 
-    flag := true
+    // flag := true
 
     for i := 0; i < len(m); i++ {
 
         for j := 0; j < len(m[0]); j++ {
 
-            flag = true
+            // flag = true
+            //
+            // for k := 0; k < len(m); k++ {
+            //     if !(m[i][j].First() > m[k][j].First()) {
+            //         flag = false
+            //         break
+            //     }
+            // }
+            //
+            // for k := 0; k < len(m[0]); k++ {
+            //     if !(m[i][j].Second() > m[i][k].Second()) {
+            //         flag = false
+            //         break
+            //     }
+            // }
 
-            for k := 0; k < len(m); k++ {
-                if !(m[i][j].First() >= m[k][j].First()) {
-                    flag = false
-                }
-            }
+            // if flag {
+            //     s = append(s, m[i][j])
+            //     idxs = append(idxs, Pair{float64(i), float64(j)})
+            // }
 
-            for k := 0; k < len(m[0]); k++ {
-                if !(m[i][j].Second() >= m[i][k].Second()) {
-                    flag = false
-                }
-            }
-
-            if flag {
+            if isNash(m, i, j) {
                 s = append(s, m[i][j])
                 idxs = append(idxs, Pair{float64(i), float64(j)})
             }
@@ -103,6 +110,29 @@ func Nash(m [][]Pair) ([]Pair, []Pair) {
     } 
 
     return s, idxs
+}
+
+func isNash(m [][]Pair, row int, col int) bool {
+
+    for k := 0; k < len(m); k++ {
+        if row == k {
+            continue
+        }
+        if m[row][col].First() <= m[k][col].First() {
+            return false
+        }
+    }
+
+    for k := 0; k < len(m[0]); k++ {
+        if col == k {
+            continue
+        }
+        if m[row][col].Second() <= m[row][k].Second() {
+            return false
+        }
+    }
+
+    return true
 }
 
 func Search(p []Pair, i, j int) bool {
@@ -160,6 +190,19 @@ func main() {
     //     {Pair{-40, 9}, Pair{24, -32}, Pair{-45, 41}, Pair{49, 34}, Pair{1, -12}, Pair{47, 43}, Pair{49, -11}, Pair{-17, -39}, Pair{26, 24}, Pair{-15, -3}},
     //     {Pair{46, -49}, Pair{9, -5}, Pair{28, 36}, Pair{-38, 24}, Pair{-11, -39}, Pair{32, -41}, Pair{9, -13}, Pair{42, 10}, Pair{19, -18}, Pair{37, 4}},
     // }
+
+    mat := [][]Pair {
+        {Pair{50, -39}, Pair{-12, -9}, Pair{20, 26}, Pair{-34, 46}, Pair{-30, 36}, Pair{-46, -33}, Pair{42, 5}, Pair{-26, 0}, Pair{20, 27}, Pair{-39, 16}},
+        {Pair{43, -30}, Pair{-20, -22}, Pair{38, 34}, Pair{43, -19}, Pair{33, -43}, Pair{-48, -32}, Pair{30, -36}, Pair{0, -1}, Pair{25, -18}, Pair{-48, 5}},
+        {Pair{-16, 21}, Pair{0, 8}, Pair{-27, -42}, Pair{-18, -35}, Pair{-41, -28}, Pair{-46, -21}, Pair{6, -12}, Pair{-22, -19}, Pair{31, -18}, Pair{25, 10}},
+        {Pair{-6, -50}, Pair{37, 21}, Pair{4, -41}, Pair{12, 31}, Pair{14, -33}, Pair{20, 2}, Pair{-4, -48}, Pair{-14, -6}, Pair{-45, -10}, Pair{-43, 30}},
+        {Pair{44, -10}, Pair{-30, -41}, Pair{24, 42}, Pair{-6, -41}, Pair{-44, -1}, Pair{34, -41}, Pair{11, -50}, Pair{29, 10}, Pair{2, -39}, Pair{5, -43}},
+        {Pair{29, -1}, Pair{6, -48}, Pair{-45, 37}, Pair{-38, 9}, Pair{-27, -33}, Pair{41, 34}, Pair{21, -22}, Pair{22, -34}, Pair{22, -14}, Pair{1, 7}},
+        {Pair{-4, -43}, Pair{7, 19}, Pair{-26, -14}, Pair{-8, -23}, Pair{9, -19}, Pair{2, -19}, Pair{46, 34}, Pair{13, 43}, Pair{-16, -42}, Pair{-33, 50}},
+        {Pair{-4, 44}, Pair{5, -38}, Pair{26, -31}, Pair{26, -27}, Pair{-9, 21}, Pair{-13, 25}, Pair{-32, 16}, Pair{-3, -16}, Pair{35, -30}, Pair{-14, 6}},
+        {Pair{-48, 25}, Pair{-47, 8}, Pair{-45, 16}, Pair{26, -7}, Pair{33, -47}, Pair{-16, 9}, Pair{-24, 43}, Pair{29, 47}, Pair{-20, 47}, Pair{3, -40}},
+        {Pair{-38, 3}, Pair{-49, -33}, Pair{6, 46}, Pair{-40, -8}, Pair{23, -24}, Pair{-38, -20}, Pair{-38, -8}, Pair{-41, 4}, Pair{-39, 33}, Pair{-12, -38}},
+    }
 
     prisoner := [][]Pair {
         {Pair{-5, -5}, Pair{0, -10}},
@@ -221,16 +264,16 @@ func main() {
 
     printMatrix(cross, idxsCP)
 
-    mat := make([][]Pair, 10)
-    for i := range mat {
-        mat[i] = make([]Pair, 10)
-    }
-
-    for i := range mat {
-        for j := range mat[i] {
-            mat[i][j] = Pair{float64(int(math.Pow(-1, float64(rand.Intn(2)))) * rand.Intn(51)), float64(int(math.Pow(-1, float64(rand.Intn(2)))) * rand.Intn(51))}
-        }
-    }
+    // mat := make([][]Pair, 10)
+    // for i := range mat {
+    //     mat[i] = make([]Pair, 10)
+    // }
+    //
+    // for i := range mat {
+    //     for j := range mat[i] {
+    //         mat[i][j] = Pair{float64(int(math.Pow(-1, float64(rand.Intn(2)))) * rand.Intn(51)), float64(int(math.Pow(-1, float64(rand.Intn(2)))) * rand.Intn(51))}
+    //     }
+    // }
 
     rn, idxsRN := Nash(mat)
     fmt.Printf("********** Random Matrix **********\n\n")
