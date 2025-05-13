@@ -216,6 +216,38 @@ func PrintMatrix(m *matrix.Matrix) {
     fmt.Println()
 }
 
+func average(s []float64) float64 {
+    if len(s) == 0 {
+        return 0
+    }
+
+    var sum float64
+
+    for _, v := range s {
+        sum += v
+    }
+
+    return sum / float64(len(s))
+}
+
+func standartDeviation(s []float64) float64 {
+
+    if len(s) == 0 {
+        return 0
+    }
+
+    avr := average(s)
+    var sum float64
+
+    for _, v := range s {
+        deviation := v - avr
+        sum += deviation * deviation
+    }
+
+    variance := sum / float64(len(s))
+    return math.Sqrt(variance)
+}
+
 func main() {
 
     t := table.NewWriter()
@@ -225,26 +257,35 @@ func main() {
     fmt.Println("********** Numerical solution **********")
     fmt.Println()
 
-    for n := 2; n <= 10; n++ {
-        fmt.Printf("N = %d\n", n)
+    sH := []float64{}
+
+    n := 2
+    for ; n <= 1000; n++ {
+        if n < 12 {
+            fmt.Printf("N = %d\n", n)
+        }
         m := HN(n)
-        // m.Display()
-        PrintMatrix(m)
 
         ai, bi, flag := checkSaddlePoint(m)
 
         if flag {
-            fmt.Println("Есть седловая точка")
 
             x := float64(ai) / float64(n)
             y := float64(bi) / float64(n)
 
-            fmt.Printf("x = %.3f\n", x)
-            fmt.Printf("y = %.3f\n", y)
-            fmt.Printf("H = %.3f\n", Hxy(x, y))
-        } else {
-            fmt.Println("Нет седловой точки")
+            if n < 12 {
+                PrintMatrix(m)
+                fmt.Println("Есть седловая точка")
+                fmt.Printf("x = %.3f\n", x)
+                fmt.Printf("y = %.3f\n", y)
+                fmt.Printf("H = %.3f\n", Hxy(x, y))
+            }
 
+            sH = append(sH, Hxy(x, y))
+            if len(sH) > 2 && standartDeviation(sH[len(sH)-5:]) < 0.001 {
+                break
+            }
+        } else {
             x, y, _ := brownrobinson.BrownRobinsonMethod(0.001, m, t)
             xmi, _ := maxInd(x)
             ymi, _ := maxInd(y)
@@ -252,34 +293,31 @@ func main() {
             xf := float64(xmi) / float64(n)
             yf := float64(ymi) / float64(n)
 
-            fmt.Printf("x = %.3f\n", xf)
-            fmt.Printf("y = %.3f\n", yf)
-            fmt.Printf("H = %.3f\n", Hxy(xf, yf))
+            if n < 12 {
+                PrintMatrix(m)
+                fmt.Println("Нет седловой точки")
+
+                fmt.Printf("x = %.3f\n", xf)
+                fmt.Printf("y = %.3f\n", yf)
+                fmt.Printf("H = %.3f\n", Hxy(xf, yf))
+            }
+
+            sH = append(sH, Hxy(xf, yf))
+            if len(sH) > 5 && standartDeviation(sH[len(sH)-5:]) < 0.001 {
+                break
+            }
         }
 
-        fmt.Println()
-        fmt.Println()
+        if n < 12 {
+            fmt.Println()
+            fmt.Println()
+        }
     }
+
+    fmt.Printf("Всего итераций: N = %d\n\n", n)
 
 
     fmt.Println("********** Analytical solution **********")
     fmt.Println()
     AnalyticalSolution()
-
-    // fmt.Println(t.Render())
-
-    // prt := func(a []float64) {
-    //     for _, v := range a {
-    //         fmt.Printf("%.3f  ", v)
-    //     }
-    //
-    //     fmt.Println()
-    // }
-    //
-    // prt(x)
-    // prt(y)
-    //
-    //
-    // fmt.Println(v)
-
 }
